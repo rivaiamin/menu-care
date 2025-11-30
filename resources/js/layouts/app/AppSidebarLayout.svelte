@@ -1,4 +1,5 @@
 <script lang="ts">
+    import AppBottomNav from '@/components/AppBottomNav.svelte';
     import AppContent from '@/components/AppContent.svelte';
     import AppShell from '@/components/AppShell.svelte';
     import AppSidebar from '@/components/AppSidebar.svelte';
@@ -20,4 +21,5 @@
         <AppSidebarHeader {breadcrumbs} />
         {@render children?.()}
     </AppContent>
+    <AppBottomNav />
 </AppShell>

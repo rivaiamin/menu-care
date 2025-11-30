@@ -5,14 +5,29 @@
     import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
     import { type NavItem } from '@/types';
     import { Link } from '@inertiajs/svelte';
-    import { BookOpen, Folder, LayoutGrid } from 'lucide-svelte';
+    import { BookOpen, Folder, Heart, Home, TrendingUp, User } from 'lucide-svelte';
     import AppLogo from './AppLogo.svelte';
 
     const mainNavItems: NavItem[] = [
         {
-            title: 'Dashboard',
+            title: 'Beranda',
             href: '/dashboard',
-            icon: LayoutGrid,
+            icon: Home,
+        },
+        {
+            title: 'Cek Progres',
+            href: '/progress',
+            icon: TrendingUp,
+        },
+        {
+            title: 'Jurnal Harian',
+            href: '/journals',
+            icon: BookOpen,
+        },
+        {
+            title: 'Mindfulness',
+            href: '/mindfulness',
+            icon: Heart,
         },
     ];
 

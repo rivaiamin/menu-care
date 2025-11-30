@@ -92,42 +92,69 @@
             {@const CategoryIcon = config.icon}
 
             <!-- Last Assessment Card -->
-            <Card class="border-2 {config.borderColor}">
-                <CardHeader>
-                    <div class="flex items-center justify-between">
-                        <CardTitle class="text-2xl">Assessment Terakhir</CardTitle>
-                        <Badge variant="outline" class="text-lg px-4 py-2">
-                            Skor: {latestQuiz.score} / 40
-                        </Badge>
-                    </div>
-                    <CardDescription>
-                        {formatDate(latestQuiz.date)}
-                    </CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <div class="flex items-start gap-6">
-                        <div class="flex h-20 w-20 shrink-0 items-center justify-center rounded-full {config.bgColor} {config.borderColor} border-2">
-                            <CategoryIcon class="h-10 w-10 {config.textColor}" />
+            <Card class="border-2 {config.borderColor} overflow-hidden {config.bgColor} shadow-md">
+                <div class="relative">
+                    <!-- Header Section -->
+                    <CardHeader class="pb-5">
+                        <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                            <div class="flex-1 space-y-1">
+                                <CardTitle class="text-xl sm:text-2xl font-bold">
+                                    Assessment Terakhir
+                                </CardTitle>
+                                <CardDescription class="text-sm sm:text-base font-medium">
+                                    {formatDate(latestQuiz.date)}
+                                </CardDescription>
+                            </div>
+                            <Badge 
+                                variant="outline" 
+                                class="text-sm sm:text-base font-bold px-4 py-2.5 w-fit {config.borderColor} {config.textColor} bg-white/90 backdrop-blur-sm shadow-sm"
+                            >
+                                Skor: {latestQuiz.score} / 40
+                            </Badge>
                         </div>
-                        <div class="flex-1">
-                            <h3 class="text-xl font-semibold {config.textColor} mb-2">
-                                Tingkat Stres: {config.label}
-                            </h3>
-                            <p class="text-muted-foreground mb-4">
-                                {config.description}
-                            </p>
-                            <div class="flex gap-2">
-                                <Link href={route('progress')} class={buttonVariants({ variant: 'outline' })}>
-                                    <TrendingUp class="mr-2 h-4 w-4" />
-                                    Lihat Progres
-                                </Link>
-                                <Link href={route('quiz')} class={buttonVariants({ variant: 'outline' })}>
-                                    Assessment Baru
-                                </Link>
+                    </CardHeader>
+
+                    <!-- Content Section -->
+                    <CardContent class="pt-0 pb-6 px-6">
+                        <div class="flex flex-col items-center text-center sm:flex-row sm:items-start sm:text-left gap-6">
+                            <!-- Icon Section -->
+                            <div class="flex-shrink-0">
+                                <div class="flex h-20 w-20 sm:h-24 sm:w-24 items-center justify-center rounded-full {config.bgColor} {config.borderColor} border-[3px] shadow-lg ring-2 ring-white/50">
+                                    <CategoryIcon class="h-10 w-10 sm:h-12 sm:w-12 {config.textColor}" />
+                                </div>
+                            </div>
+
+                            <!-- Text Section -->
+                            <div class="flex-1 min-w-0 space-y-4">
+                                <div class="space-y-2">
+                                    <h3 class="text-lg sm:text-xl font-bold {config.textColor}">
+                                        Tingkat Stres: {config.label}
+                                    </h3>
+                                    <p class="text-sm sm:text-base text-muted-foreground leading-relaxed max-w-2xl">
+                                        {config.description}
+                                    </p>
+                                </div>
+
+                                <!-- Action Buttons -->
+                                <div class="flex flex-col sm:flex-row gap-2.5 pt-1">
+                                    <Link 
+                                        href={route('progress')} 
+                                        class={buttonVariants({ variant: 'default' }) + ' w-full sm:w-auto justify-center shadow-sm hover:shadow-md transition-shadow'}
+                                    >
+                                        <TrendingUp class="mr-2 h-4 w-4" />
+                                        Lihat Progres
+                                    </Link>
+                                    <Link 
+                                        href={route('quiz')} 
+                                        class={buttonVariants({ variant: 'outline' }) + ' w-full sm:w-auto justify-center border-2 hover:bg-accent/50 transition-colors'}
+                                    >
+                                        Assessment Baru
+                                    </Link>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </CardContent>
+                    </CardContent>
+                </div>
             </Card>
         {:else}
             <!-- No Assessment Card -->
