@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\JournalController;
 use App\Http\Controllers\QuizController;
 use Illuminate\Support\Facades\Route;
@@ -9,9 +10,9 @@ Route::get('/', function () {
     return Inertia::render('Welcome');
 })->name('home');
 
-Route::get('dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified', 'quiz.completed'])->name('dashboard');
+Route::get('dashboard', [App\Http\Controllers\DashboardController::class, 'index'])
+    ->middleware(['auth', 'verified', 'quiz.completed'])
+    ->name('dashboard');
 
 // Quiz routes
 Route::middleware('auth')->group(function () {
@@ -24,6 +25,14 @@ Route::middleware('auth')->group(function () {
 // Journal routes
 Route::middleware(['auth', 'quiz.completed'])->group(function () {
     Route::resource('journals', JournalController::class);
+});
+
+// Progress routes
+Route::middleware(['auth', 'quiz.completed'])->group(function () {
+    Route::get('api/progress', [DashboardController::class, 'progress'])->name('progress.api');
+    Route::get('progress', function () {
+        return Inertia::render('Progress');
+    })->name('progress');
 });
 
 require __DIR__.'/settings.php';

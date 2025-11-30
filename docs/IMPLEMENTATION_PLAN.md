@@ -129,17 +129,17 @@
 ## Phase 4: Homepage & Progress Tracking (Week 3)
 
 ### 4.1 Backend (Laravel)
-- [ ] Create `DashboardController` for user stats
-- [ ] API Endpoint: `GET /api/progress` (History of quiz scores)
+- [x] Create `DashboardController` for user stats
+- [x] API Endpoint: `GET /api/progress` (History of quiz scores)
 
 ### 4.2 Frontend (Svelte)
-- [ ] Create Homepage (`/` or `/dashboard`) - BERANDA
-- [ ] Display last assessment score result prominently
-- [ ] Show user's current stress category status
-- [ ] Create `/progress` page (Cek Progres)
-- [ ] Integrate Chart.js or similar for:
-  - Stress score progression (line chart)
-  - Category distribution (bar/pie chart)
+- [x] Create Homepage (`/` or `/dashboard`) - BERANDA
+- [x] Display last assessment score result prominently
+- [x] Show user's current stress category status
+- [x] Create `/progress` page (Cek Progres)
+- [x] Integrate Chart.js or similar for:
+  - [x] Stress score progression (line chart)
+  - [x] Category distribution (bar/pie chart)
 
 ---
 
