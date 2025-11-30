@@ -74,38 +74,68 @@ This document summarizes the updates made to the documentation based on the clie
 - **Positive Affirmation (Afirmasi Positif)** + Video
 - **Tips and Mental Health Education** (Articles)
 
-### 5. Quiz Result Recommendations
+### 5. Quiz Result Flow (Updated from Flowchart)
+
+**Key Finding:** All quiz result categories redirect to **Homepage (BERANDA)**, not directly to journal or consultation pages.
 
 **Rendah (0-13):**
-- Deep Breathing Relaxation
-- Read Mental Health Tips and Education
-- Redirect to `/journal`
+- Show recommendations: Deep Breathing Relaxation, Read Mental Health Tips and Education
+- **Redirect to Homepage (BERANDA)**
 
 **Sedang (14-26):**
-- Mindfulness (Meditation, Deep Breathing, Positive Affirmation)
-- Read Mental Health Tips and Education
-- Consider Consulting a Professional
-- Redirect to `/journal`
+- Show recommendations: Mindfulness (Meditation, Deep Breathing, Positive Affirmation), Read Mental Health Tips and Education, Consider Consulting a Professional
+- **Redirect to Homepage (BERANDA)**
 
 **Berat (27-40):**
-- Mindfulness (Meditation, Deep Breathing, Positive Affirmation)
-- Read Mental Health Tips and Education
+- Show recommendations: Mindfulness (Meditation, Deep Breathing, Positive Affirmation), Read Mental Health Tips and Education
 - **Warning:** If severe symptoms appear (severe sleep disorder, feeling unable to control oneself) → immediately seek professional help
-- Links to Halodoc or Alodokter
-- Redirect to `/consultation`
+- Show links to Halodoc or Alodokter
+- **Redirect to Homepage (BERANDA)**
 
 ### 6. Database Schema Updates
 
 **users table:**
 - Added `phone_number` (String, optional)
-- Added `profile_photo_path` (String, optional)
-- Added `last_quiz_timestamp` (Timestamp) for 24-hour validity check
+- Added `profile_photo_path` (String, optional) - stored in local storage
+- Added `last_quiz_date` (Date, optional)
+- Added `last_quiz_timestamp` (Timestamp) for 24-hour validity check (uses user timezone)
 
 **daily_quizzes table:**
 - Updated `answers` to be array of 10 items (was 20)
 - Updated `score` range: 0-40 (was different)
 - Updated `category` values: `rendah`, `sedang`, `berat` (was `ringan`, `sedang`, `berat`)
-- `created_at` timestamp now critical for 24-hour validity check
+- `created_at` timestamp now critical for 24-hour validity check (uses user timezone)
+
+### 7. Additional Clarifications (Latest Updates)
+
+**Authentication:**
+- Using Laravel Session-based authentication (Inertia.js SPA), not Sanctum API tokens
+- Session lifetime: 120 minutes (configurable)
+
+**Timezone:**
+- 24-hour validity check uses user's timezone (configured via `APP_TIMEZONE` env variable)
+
+**Middleware:**
+- Quiz validation middleware allows exceptions: `/profile` and `/logout` routes accessible even if quiz expired
+
+**Content Filtering:**
+- Content (articles, videos, audios) filtered by `recommended_state` enum only (not tags)
+- Tags field exists but not used for filtering currently
+
+**File Storage:**
+- Profile photos and media files stored in local storage (`storage/app/public`)
+
+**Journaling:**
+- Journaling is **optional** and accessed from Features menu
+- Not required after quiz completion
+
+**Progress Page:**
+- Shows both: stress score progression (line chart) and category distribution (bar/pie chart)
+
+**Consultation Page:**
+- Static page describing user condition and recommended steps
+- Contains links to Halodoc and Alodokter
+- Accessible from Features menu or recommended for "Berat" category
 
 ---
 
@@ -121,27 +151,36 @@ This document summarizes the updates made to the documentation based on the clie
 
 ## Action Items for Implementation
 
-### Critical (Before Development)
-1. ⚠️ **Confirm exact PSS-10 questions in Indonesian** with client
-2. ⚠️ **Confirm reverse scoring logic** (if any questions need reverse scoring)
-3. ⚠️ **Confirm scoring calculation** (how to get 0-40 range from 1-5 scale answers)
+### Critical (Before Development) ✅ CONFIRMED
+1. ✅ **PSS-10 questions in Indonesian** - Confirmed (see QUIZ_PSS10.md)
+2. ✅ **Reverse scoring logic** - Confirmed (questions 4, 5, 7, 8 use `4 - answer`)
+3. ✅ **Scoring calculation** - Confirmed (0-4 scale, sum after reverse scoring = 0-40 range)
+4. ✅ **Authentication method** - Confirmed (Session-based, Inertia.js)
+5. ✅ **Timezone** - Confirmed (User timezone via `APP_TIMEZONE` env)
+6. ✅ **File storage** - Confirmed (Local storage)
+7. ✅ **Content filtering** - Confirmed (`recommended_state` only)
+8. ✅ **Middleware exceptions** - Confirmed (allow `/profile`, `/logout`)
+9. ✅ **Progress charts** - Confirmed (both score progression and category distribution)
+10. ✅ **Journaling** - Confirmed (Optional)
 
 ### High Priority
-1. Update `src/data/quiz-questions.json` with actual PSS-10 questions
-2. Update middleware to use 24-hour validity check
-3. Create homepage (`/app` or `/app/home`) component
-4. Create progress page (`/app/progress`) component
+1. Update User model `$fillable` array with new fields
+2. Implement `EnsureQuizCompleted` middleware (24-hour check with exceptions)
+3. Create homepage (`/` or `/dashboard`) - BERANDA component
+4. Create progress page (`/progress`) component with dual charts
 5. Update profile page with new sections
+6. Create consultation static page
 
 ### Medium Priority
-6. Create mindfulness feature pages (meditation, breathing, affirmation)
-7. Implement recommendations display in quiz result
-8. Add profile photo upload functionality
-9. Add phone number field to user registration/profile
+7. Create mindfulness feature pages (meditation, breathing, affirmation)
+8. Implement recommendations display in quiz result page
+9. Add profile photo upload functionality (local storage)
+10. Add phone number field to user registration/profile
+11. Create quiz controller and models
 
 ### Low Priority
-10. Update existing quiz data if any exists
-11. Migration script for existing data (if applicable)
+12. Update existing quiz data if any exists
+13. Migration script for existing data (if applicable)
 
 ---
 
@@ -153,11 +192,28 @@ This document summarizes the updates made to the documentation based on the clie
 
 ---
 
-## Questions for Client
+## Implementation Notes
 
-1. What are the exact PSS-10 questions in Indonesian?
-2. Are there any reverse-scored questions in PSS-10? (Standard PSS-10 has some reverse-scored items)
-3. How should the scoring work to get 0-40 range from 1-5 scale answers?
-4. Should profile photos be stored in local storage or S3?
-5. What timezone should be used for the 24-hour validity check? (WIB/WITA/WIT?)
+### Flowchart Analysis Summary
+
+Based on the flowchart review, key findings:
+
+1. **All quiz results redirect to BERANDA (Homepage)** - not directly to journal or consultation
+2. **Journaling is optional** - accessed from Features menu, not forced after quiz
+3. **Consultation page** - Static page with condition description and recommended steps, accessible from Features menu
+4. **Homepage displays last assessment score** prominently
+5. **Features menu structure:**
+   - Mindfullnes (Meditasi Singkat, Relaksasi Nafas Dalam, Afirmasi Positif)
+   - Jurnal Harian (Daily Journal)
+   - Tips Dan Edukasi Mental Health (Articles)
+
+### Technical Decisions Confirmed
+
+- ✅ Authentication: Laravel Session-based (Inertia.js SPA)
+- ✅ Timezone: User timezone via `APP_TIMEZONE` environment variable
+- ✅ File Storage: Local storage (`storage/app/public`)
+- ✅ Content Filtering: `recommended_state` enum only
+- ✅ Middleware: Allow `/profile` and `/logout` even if quiz expired
+- ✅ Progress Charts: Both score progression and category distribution
+- ✅ Journaling: Optional feature
 

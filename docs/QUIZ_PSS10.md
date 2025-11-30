@@ -104,56 +104,57 @@ Cursor must implement category mapping exactly as above.
 ### **24-Hour Validity Rule**
 
 * User must complete this quiz **once per 24 hours**.
-* Quiz is valid for **1x24 hours** from the time of completion.
+* Quiz is valid for **1x24 hours** from the time of completion (using user's timezone).
+* Timezone is configured via `APP_TIMEZONE` environment variable.
 * If user completed quiz within the last 24 hours → redirect to homepage (skip quiz).
-* If quiz not completed or expired (more than 24 hours ago) → redirect to `/quiz` (block all other routes).
+* If quiz not completed or expired (more than 24 hours ago) → redirect to `/quiz` (block all routes except `/profile`, `/logout`).
 
 ### **Post-Quiz Flow**
 
-Based on assessment score result:
+Based on assessment score result, **all categories redirect to Homepage (BERANDA)** after showing recommendations:
 
 * **Rendah (0-13):**
   * Show recommendations: Deep Breathing Relaxation, Read Mental Health Tips and Education
-  * Redirect to `/journal`
+  * Redirect to Homepage (BERANDA)
 
 * **Sedang (14-26):**
   * Show recommendations: Mindfulness (Meditation, Deep Breathing, Positive Affirmation), Read Mental Health Tips and Education, Consider Consulting a Professional
-  * Redirect to `/journal`
+  * Redirect to Homepage (BERANDA)
 
 * **Berat (27-40):**
   * Show recommendations: Mindfulness (Meditation, Deep Breathing, Positive Affirmation), Read Mental Health Tips and Education
   * Show warning: If severe symptoms appear (severe sleep disorder, feeling unable to control oneself) → immediately seek professional help
   * Show links to Halodoc or Alodokter
-  * Redirect to `/consultation`
+  * Redirect to Homepage (BERANDA)
 
 ---
 
-## **6. Database Schema (Supabase)**
+## **6. Database Schema (MySQL/Laravel)**
 
-### Table: `daily_quiz`
+### Table: `daily_quizzes`
 
 ```
-id               uuid (pk)
-user_id          uuid (fk -> app_users.id)
-date             date (unique per user per day)
-answers          jsonb (10 items, each having id/value 0-4)
+id               bigint (pk, auto increment)
+user_id          bigint (fk -> users.id, cascade delete)
+date             date
+answers          json (10 items, each having id/value 0-4)
 score            int (0-40)
-category         text  (rendah | sedang | berat)
-created_at       timestamptz (used for 24-hour validity check)
+category         enum('rendah', 'sedang', 'berat')
+created_at       timestamp (used for 24-hour validity check, uses user timezone)
+updated_at       timestamp
 ```
 
 **Constraints:**
-* `(user_id, date)` must be unique.
-* `created_at` timestamp is critical for 24-hour validity calculation.
+* Foreign key constraint on `user_id` with cascade delete.
+* `created_at` timestamp is critical for 24-hour validity calculation (uses user's timezone).
 
-**24-Hour Check Logic:**
-```sql
--- Example query to check if quiz is still valid (within 24 hours)
-SELECT * FROM daily_quiz
-WHERE user_id = $1
-  AND created_at > NOW() - INTERVAL '24 hours'
-ORDER BY created_at DESC
-LIMIT 1;
+**24-Hour Check Logic (Laravel):**
+```php
+// Example query to check if quiz is still valid (within 24 hours)
+$validQuiz = DailyQuiz::where('user_id', $userId)
+    ->where('created_at', '>', now()->subHours(24))
+    ->latest('created_at')
+    ->first();
 ```
 
 ---
@@ -169,9 +170,9 @@ LIMIT 1;
   1. Apply reverse scoring to questions 4, 5, 7, 8 (score = 4 - answer).
   2. Sum all 10 scores (after reverse scoring).
   3. Map category (rendah/sedang/berat).
-  4. Save to Supabase with `created_at` timestamp.
+  4. Save to database with `created_at` timestamp (using user's timezone).
   5. Show assessment score result with recommendations.
-  6. Redirect based on category.
+  6. Redirect to Homepage (BERANDA) for all categories.
 
 ### **Components to generate**
 
@@ -192,21 +193,24 @@ LIMIT 1;
   - For forward-scored questions: `score = answer`
 * Compute final score (sum of all 10 scores after reverse scoring).
 * Map to category (rendah/sedang/berat).
-* Store into Supabase with `created_at` timestamp.
+* Store into database with `created_at` timestamp (using user's timezone).
 * Return `{ score, category, recommendations }`.
 
-### Middleware Logic
+### Middleware Logic (Laravel)
 
 * Check if user has completed quiz within last 24 hours:
-  ```typescript
-  const lastQuiz = await getLastQuizWithin24Hours(userId);
-  if (lastQuiz && isWithin24Hours(lastQuiz.created_at)) {
-    // Allow access to homepage
-    return NextResponse.next();
+  ```php
+  // EnsureQuizCompleted Middleware
+  $lastQuiz = DailyQuiz::where('user_id', auth()->id())
+      ->where('created_at', '>', now()->subHours(24))
+      ->latest('created_at')
+      ->first();
+  
+  if (!$lastQuiz && !in_array($request->route()->getName(), ['quiz', 'profile', 'logout'])) {
+      return redirect()->route('quiz');
   }
-  // Redirect to /quiz
-  return NextResponse.redirect('/quiz');
   ```
+* Exceptions: Allow access to `/quiz`, `/profile`, and `/logout` routes even if quiz is expired.
 
 ---
 

@@ -1,7 +1,7 @@
 # **PRODUCT REQUIREMENT DOCUMENT (AI-OPTIMIZED FOR CURSOR)**
 
 **Project:** Web Apps – Kesehatan Mental Tenaga Kesehatan
-**Tech Stack:** Laravel 11, FilamentPHP 3, SvelteKit, MySQL
+**Tech Stack:** Laravel 12 + Inertia.js + Svelte 5, FilamentPHP 4, MySQL
 **Goal:** Build a mental-health tracking platform for medical workers with daily stress quiz, journaling, progress charts, and personalized mindfulness content. Admins monitor aggregated trends and manage content.
 
 ---
@@ -28,8 +28,9 @@
 
 ### **2.1 Authentication**
 
-* Email/password login via Laravel Sanctum (API) / Session.
+* Email/password login via Laravel Session-based authentication (Inertia.js SPA).
 * Auto-logout after idle (configurable in Laravel config).
+* Session lifetime: 120 minutes (configurable via `SESSION_LIFETIME` env variable).
 
 ---
 
@@ -43,29 +44,30 @@
   * 14–26 → Sedang (Medium)
   * 27–40 → Berat (High)
 * **24-Hour Validity Rule:**
-  * Quiz is valid for 1x24 hours (24 hours from completion)
+  * Quiz is valid for 1x24 hours (24 hours from completion time, using user's timezone)
   * If user completed quiz within the last 24 hours → redirect to homepage (skip quiz)
-  * If quiz not completed or expired → redirect to /quiz (block all other routes)
+  * If quiz not completed or expired → redirect to /quiz (block all other routes except `/profile`, `/logout`)
+  * Timezone configured via `APP_TIMEZONE` environment variable
 
 ---
 
 ### **2.3 Quiz Result Flow & Recommendations**
 
-After quiz completion, user sees assessment score result and recommendations:
+After quiz completion, user sees assessment score result and recommendations, then **all categories redirect to Homepage (BERANDA)**:
 
 * **Rendah (Score 0-13):**
   * Recommendations: Deep Breathing Relaxation, Read Mental Health Tips and Education
-  * Redirect to /journal
+  * Redirect to Homepage (BERANDA)
 
 * **Sedang (Score 14-26):**
   * Recommendations: Mindfulness (Meditation, Deep Breathing, Positive Affirmation), Read Mental Health Tips and Education, Consider Consulting a Professional
-  * Redirect to /journal
+  * Redirect to Homepage (BERANDA)
 
 * **Berat (Score 27-40):**
   * Recommendations: Mindfulness (Meditation, Deep Breathing, Positive Affirmation), Read Mental Health Tips and Education
   * **Warning:** If severe symptoms appear (severe sleep disorder, feeling unable to control oneself) → immediately seek professional help
   * Links to Halodoc or Alodokter for professional consultation
-  * Redirect to /consultation
+  * Redirect to Homepage (BERANDA)
 
 ---
 
@@ -75,7 +77,8 @@ After quiz completion, user sees assessment score result and recommendations:
   * title: string | optional
   * content: text
   * mood: integer (1–5)
-* Journaling required only once after quiz.
+* Journaling is **optional** and accessed from Features menu (Fitur Fitur → Jurnal Harian)
+* Users can create multiple journal entries
 
 ---
 
@@ -92,9 +95,9 @@ After quiz completion, user sees assessment score result and recommendations:
 * Separate feature/page for viewing progress statistics
 * Displays daily stress statistics per date
 * Shows trend over time (daily/date-based)
-* Data visualization: charts/graphs showing stress score progression
-* X-axis: dates
-* Y-axis: score/category
+* Data visualization: charts/graphs showing:
+  * **Stress score progression** (line chart: X-axis = dates, Y-axis = score 0-40)
+  * **Category distribution** (bar/pie chart showing distribution of rendah/sedang/berat over time)
 
 ---
 
@@ -140,18 +143,16 @@ Main mindfulness section with three core features:
 * Articles on how to overcome stress (Artikel Artikel Cara Mengatasi Stres)
 * Educational content about mental health
 * Content stored in Laravel Database (managed via Filament)
-* Filtered by user stress category and admin-defined tags
+* Filtered by `recommended_state` enum (rendah, sedang, berat, semua) based on user's current stress category
 
 ---
 
-### **2.9 Daily Journal (Jurnal Harian)**
+### **2.9 Consultation Page**
 
-* User/Nurse notes (Catatan Pengguna / Perawat)
-* Fields:
-  * title: string | optional
-  * content: text
-  * mood: integer (1–5)
-* Journaling required after quiz (except when quiz result = berat, which redirects to consultation)
+* Static page accessible from Features menu or recommended for "Berat" category
+* Describes user condition and recommended steps
+* Contains links to Halodoc and Alodokter for professional consultation
+* Explains when to seek immediate professional help (severe sleep disorder, feeling unable to control oneself)
 
 ---
 
@@ -184,9 +185,9 @@ Collections (Resources):
   Fields include:
 * title
 * content/body
-* media file (optional)
-* tags
-* recommended_state: ringan | sedang | berat | semua
+* media file (optional, stored in local storage)
+* tags (for future use, currently not used for filtering)
+* recommended_state: rendah | sedang | berat | semua (used for filtering content)
 
 ---
 
@@ -230,15 +231,17 @@ Collections (Resources):
 
 ## **5. Technical Architecture**
 
-* **Backend:** Laravel 11 (API + Admin Panel)
-* **Frontend:** SvelteKit (Client-side rendering or SSR consuming Laravel API)
-* **Admin Panel:** FilamentPHP 3 (Livewire-based, runs within Laravel)
+* **Backend:** Laravel 12 (Inertia.js Server + Admin Panel)
+* **Frontend:** Svelte 5 + Inertia.js (SPA architecture, server-side rendering via Inertia)
+* **Admin Panel:** FilamentPHP 4 (Livewire-based, runs within Laravel)
 * **Database:** MySQL 8
-* **Authentication:** Laravel Sanctum (SPA Auth or Token)
+* **Authentication:** Laravel Session-based (Inertia.js SPA authentication)
+* **File Storage:** Local storage (`storage/app/public`) for profile photos and media files
+* **Timezone:** User timezone configured via `APP_TIMEZONE` environment variable
 * **Middleware:**
-  * Check if user has completed quiz within last 24 hours
+  * Check if user has completed quiz within last 24 hours (using user's timezone)
   * If quiz completed within 24 hours → allow access to homepage
-  * If quiz not completed or expired → redirect to /quiz (block all other routes)
+  * If quiz not completed or expired → redirect to /quiz (block all routes except `/profile`, `/logout`)
 
 ---
 
