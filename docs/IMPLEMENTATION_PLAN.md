@@ -105,15 +105,24 @@
 
 ## Phase 3: Journaling Feature (Week 2-3)
 
-### 3.1 Backend (Laravel)
-- [ ] Create `Journal` Model
-- [ ] Create `JournalController`
-- [ ] API Endpoints: `GET /api/journals`, `POST /api/journals`
+### 3.1 Backend (Laravel) ✅ COMPLETED
+- [x] Create `Journal` Model
+- [x] Create `JournalController` (full CRUD: index, create, store, show, edit, update, destroy)
+- [x] Create `JournalRequest` for validation
+- [x] Add `journals()` relationship to User model
+- [x] Routes: Resource routes for journals (`/journals`)
+- [x] Mood options constant (1-5 scale with labels and emojis)
 
-### 3.2 Frontend (Svelte)
-- [ ] Create `/journal` page (accessed from Features menu)
-- [ ] Build Journal Form (Title, Content, Mood) - Optional
-- [ ] Display Journal History
+### 3.2 Frontend (Svelte) ✅ COMPLETED
+- [x] Create `/journals` Index page (`resources/js/pages/journal/Index.svelte`)
+- [x] Create `/journals/create` Create page (`resources/js/pages/journal/Create.svelte`)
+- [x] Create `/journals/{id}` Show page (`resources/js/pages/journal/Show.svelte`)
+- [x] Create `/journals/{id}/edit` Edit page (`resources/js/pages/journal/Edit.svelte`)
+- [x] Build Journal Form (Title optional, Content required, Mood 1-5) with RadioGroup
+- [x] Display Journal History with pagination
+- [x] Mood selection with emojis (😢 😞 😐 🙂 😊)
+- [x] Delete confirmation dialog
+- [x] Date formatting (Indonesian locale)
 
 ---
 

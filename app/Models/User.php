@@ -72,4 +72,12 @@ class User extends Authenticatable
             ->latest('created_at')
             ->first();
     }
+
+    /**
+     * Get the journals for the user.
+     */
+    public function journals(): HasMany
+    {
+        return $this->hasMany(Journal::class);
+    }
 }
