@@ -105,8 +105,8 @@
                                     {formatDate(latestQuiz.date)}
                                 </CardDescription>
                             </div>
-                            <Badge 
-                                variant="outline" 
+                            <Badge
+                                variant="outline"
                                 class="text-sm sm:text-base font-bold px-4 py-2.5 w-fit {config.borderColor} {config.textColor} bg-white/90 backdrop-blur-sm shadow-sm"
                             >
                                 Skor: {latestQuiz.score} / 40
@@ -137,15 +137,15 @@
 
                                 <!-- Action Buttons -->
                                 <div class="flex flex-col sm:flex-row gap-2.5 pt-1">
-                                    <Link 
-                                        href={route('progress')} 
+                                    <Link
+                                        href={route('progress')}
                                         class={buttonVariants({ variant: 'default' }) + ' w-full sm:w-auto justify-center shadow-sm hover:shadow-md transition-shadow'}
                                     >
                                         <TrendingUp class="mr-2 h-4 w-4" />
                                         Lihat Progres
                                     </Link>
-                                    <Link 
-                                        href={route('quiz')} 
+                                    <Link
+                                        href={route('quiz')}
                                         class={buttonVariants({ variant: 'outline' }) + ' w-full sm:w-auto justify-center border-2 hover:bg-accent/50 transition-colors'}
                                     >
                                         Assessment Baru

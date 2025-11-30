@@ -54,7 +54,7 @@
         {#each navItems as item (item.title)}
             {@const Icon = item.icon}
             {@const isActiveItem = isActive(item.href, currentPath)}
-            
+
             <Link
                 href={item.href}
                 class={cn(

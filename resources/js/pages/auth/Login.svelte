@@ -18,10 +18,10 @@
 </script>
 
 <svelte:head>
-    <title>Login</title>
+    <title>Masuk - MeNu Care</title>
 </svelte:head>
 
-<AuthBase title="Log in to your account" description="Enter your email and password below to log in">
+<AuthBase title="Masuk ke akun Anda" description="Masukkan email dan kata sandi Anda di bawah untuk masuk">
     {#if status}
         <div class="mb-4 text-center text-sm font-medium text-green-600">
             {status}
@@ -32,7 +32,7 @@
         {#snippet children({ errors, processing }: { errors: Record<string, string>; processing: boolean })}
             <div class="grid gap-6">
                 <div class="grid gap-2">
-                    <Label for="email">Email address</Label>
+                    <Label for="email">Alamat Email</Label>
                     <Input
                         id="email"
                         name="email"
@@ -48,9 +48,9 @@
 
                 <div class="grid gap-2">
                     <div class="flex items-center justify-between">
-                        <Label for="password">Password</Label>
+                        <Label for="password">Kata Sandi</Label>
                         {#if canResetPassword}
-                            <TextLink href={route('password.request')} class="text-sm" tabindex={5}>Forgot password?</TextLink>
+                            <TextLink href={route('password.request')} class="text-sm" tabindex={5}>Lupa kata sandi?</TextLink>
                         {/if}
                     </div>
                     <Input
@@ -60,7 +60,7 @@
                         required
                         tabindex={2}
                         autocomplete="current-password"
-                        placeholder="Password"
+                        placeholder="Kata sandi"
                     />
                     <InputError message={errors.password} />
                 </div>
@@ -68,7 +68,7 @@
                 <div class="flex items-center justify-between">
                     <Label for="remember" class="flex items-center space-x-3">
                         <Checkbox id="remember" name="remember" tabindex={3} />
-                        <span>Remember me</span>
+                        <span>Ingat saya</span>
                     </Label>
                 </div>
 
@@ -76,13 +76,13 @@
                     {#if processing}
                         <LoaderCircle class="h-4 w-4 animate-spin" />
                     {/if}
-                    Log in
+                    Masuk
                 </Button>
             </div>
 
             <div class="text-center text-sm text-muted-foreground">
-                Don't have an account?
-                <TextLink href={route('register')} tabindex={5}>Sign up</TextLink>
+                Belum punya akun?
+                <TextLink href={route('register')} tabindex={5}>Daftar</TextLink>
             </div>
         {/snippet}
     </Form>
