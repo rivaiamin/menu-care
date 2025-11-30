@@ -1,7 +1,7 @@
 <script lang="ts">
     import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
     import { Badge } from '@/components/ui/badge';
-    import { Button } from '@/components/ui/button';
+    import { Button, buttonVariants } from '@/components/ui/button';
     import AppLayout from '@/layouts/AppLayout.svelte';
     import { Link } from '@inertiajs/svelte';
     import { AlertCircle, CheckCircle2, Info, TrendingUp, BookOpen, Heart } from 'lucide-svelte';
@@ -117,17 +117,13 @@
                                 {config.description}
                             </p>
                             <div class="flex gap-2">
-                                <Button asChild variant="outline">
-                                    <Link href={route('progress')}>
-                                        <TrendingUp class="mr-2 h-4 w-4" />
-                                        Lihat Progres
-                                    </Link>
-                                </Button>
-                                <Button asChild variant="outline">
-                                    <Link href={route('quiz')}>
-                                        Assessment Baru
-                                    </Link>
-                                </Button>
+                                <Link href={route('progress')} class={buttonVariants({ variant: 'outline' })}>
+                                    <TrendingUp class="mr-2 h-4 w-4" />
+                                    Lihat Progres
+                                </Link>
+                                <Link href={route('quiz')} class={buttonVariants({ variant: 'outline' })}>
+                                    Assessment Baru
+                                </Link>
                             </div>
                         </div>
                     </div>
@@ -143,11 +139,9 @@
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <Button asChild>
-                        <Link href={route('quiz')}>
-                            Mulai Assessment
-                        </Link>
-                    </Button>
+                    <Link href={route('quiz')} class={buttonVariants()}>
+                        Mulai Assessment
+                    </Link>
                 </CardContent>
             </Card>
         {/if}
@@ -167,11 +161,9 @@
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <Button asChild variant="outline" class="w-full">
-                        <Link href={route('progress')}>
-                            Lihat Progres
-                        </Link>
-                    </Button>
+                    <Link href={route('progress')} class={buttonVariants({ variant: 'outline' }) + ' w-full'}>
+                        Lihat Progres
+                    </Link>
                 </CardContent>
             </Card>
 
@@ -188,11 +180,9 @@
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <Button asChild variant="outline" class="w-full">
-                        <Link href={route('journals.index')}>
-                            Buka Jurnal
-                        </Link>
-                    </Button>
+                    <Link href={route('journals.index')} class={buttonVariants({ variant: 'outline' }) + ' w-full'}>
+                        Buka Jurnal
+                    </Link>
                 </CardContent>
             </Card>
 
@@ -209,9 +199,9 @@
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <Button asChild variant="outline" class="w-full" disabled>
-                        <span>Segera Hadir</span>
-                    </Button>
+                    <Link href={route('mindfulness')} class={buttonVariants({ variant: 'outline' }) + ' w-full'}>
+                        Buka Mindfulness
+                    </Link>
                 </CardContent>
             </Card>
         </div>

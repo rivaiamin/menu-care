@@ -143,22 +143,23 @@
 
 ---
 
-## Phase 5: Mindfulness Features (Week 4)
+## Phase 5: Mindfulness Features (Week 4) ✅ COMPLETED
 
-### 5.1 Backend (FilamentPHP)
-- [ ] Create Filament Resources:
+### 5.1 Backend (FilamentPHP) ✅
+- [x] Create Filament Resources:
     - `ArticleResource`
     - `VideoResource`
     - `AudioResource`
-- [ ] Configure File Uploads (Local storage: `storage/app/public`)
-- [ ] API Endpoints: `GET /api/content/{type}` (Filter by `recommended_state` only)
-- [ ] Create Consultation static page
+- [x] Configure File Uploads (Local storage: `storage/app/public`)
+- [x] API Endpoints: `GET /api/content/{type}` (Filter by `recommended_state` only)
+- [x] Create Consultation static page
 
-### 5.2 Frontend (Svelte)
-- [ ] Create `/mindfulness` hub (Fitur Fitur → Mindfullnes)
-- [ ] Create sub-pages: `/meditation`, `/breathing`, `/affirmation`
-- [ ] Create `/consultation` static page (describes condition and recommended steps)
-- [ ] Fetch and display content from API (filtered by `recommended_state`)
+### 5.2 Frontend (Svelte) ✅
+- [x] Create `/mindfulness` hub (Fitur Fitur → Mindfullnes)
+- [x] Create sub-pages: `/meditation`, `/breathing`, `/affirmation`
+- [x] Create `/articles` page for tips and education
+- [x] Create `/consultation` static page (describes condition and recommended steps)
+- [x] Fetch and display content from API (filtered by `recommended_state`)
 
 ---
 
