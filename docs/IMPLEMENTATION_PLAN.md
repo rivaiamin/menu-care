@@ -78,19 +78,28 @@
 
 ## Phase 2: Daily Quiz Feature (Week 2)
 
-### 2.1 Backend (Laravel)
-- [ ] Create `DailyQuiz` Model
-- [ ] Create `QuizController`
-- [ ] Implement `store` method (Calculate score, determine category)
-- [ ] Implement 24-hour validity check logic
-- [ ] API Endpoint: `POST /api/quiz`
-- [ ] API Endpoint: `GET /api/quiz/status` (Check if valid quiz exists)
+### 2.1 Backend (Laravel) ✅ COMPLETED
+- [x] Create `DailyQuiz` Model
+- [x] Create `QuizController`
+- [x] Implement `show` method (Display quiz page)
+- [x] Implement `store` method (Calculate score, determine category, reverse scoring)
+- [x] Implement `result` method (Show quiz result with recommendations)
+- [x] Implement `status` method (Check if valid quiz exists)
+- [x] Create `QuizRequest` for validation
+- [x] Implement 24-hour validity check logic (in middleware)
+- [x] Route: `GET /quiz` (Show quiz page)
+- [x] Route: `POST /quiz` (Submit quiz)
+- [x] Route: `GET /quiz/result` (Show result page)
+- [x] Route: `GET /api/quiz/status` (Check if valid quiz exists)
 
-### 2.2 Frontend (Svelte)
-- [ ] Create `/quiz` page
-- [ ] Build Quiz Form (PSS-10 Questions)
-- [ ] Implement Score Calculation Display (Result Page with Recommendations)
-- [ ] Redirect logic: All categories → Homepage (BERANDA)
+### 2.2 Frontend (Svelte) ✅ COMPLETED
+- [x] Create `/quiz` page (`resources/js/pages/quiz/Quiz.svelte`)
+- [x] Build Quiz Form (PSS-10 Questions with RadioGroup)
+- [x] Implement Progress Bar (shows completion progress)
+- [x] Implement Score Calculation Display (Result Page with Recommendations)
+- [x] Display recommendations based on category
+- [x] Show warning and consultation links for "berat" category
+- [x] Redirect logic: All categories → Homepage (BERANDA) via button
 
 ---
 
