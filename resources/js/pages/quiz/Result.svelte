@@ -6,7 +6,6 @@
     import AppLayout from '@/layouts/AppLayout.svelte';
     import { router } from '@inertiajs/svelte';
     import { AlertCircle, CheckCircle2, ExternalLink, Info } from 'lucide-svelte';
-    import { route } from 'ziggy-js';
 
     interface Recommendation {
         title: string;
@@ -109,7 +108,7 @@
                 <ul class="space-y-3">
                     {#each result.recommendations.recommendations as recommendation}
                         <li class="flex items-start gap-3">
-                            <CheckCircle2 class="mt-0.5 h-5 w-5 text-green-500 flex-shrink-0" />
+                            <CheckCircle2 class="mt-0.5 h-5 w-5 text-green-500 shrink-0" />
                             <span class="text-sm">{recommendation}</span>
                         </li>
                     {/each}
@@ -140,13 +139,13 @@
                         {#each result.recommendations.consultationLinks as link}
                             <Button
                                 variant="outline"
-                                asChild
+                                href={link.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
                                 class="gap-2"
                             >
-                                <a href={link.url} target="_blank" rel="noopener noreferrer">
-                                    {link.name}
-                                    <ExternalLink class="h-4 w-4" />
-                                </a>
+                                {link.name}
+                                <ExternalLink class="h-4 w-4" />
                             </Button>
                         {/each}
                     </div>

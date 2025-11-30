@@ -8,7 +8,6 @@
     import AppLayout from '@/layouts/AppLayout.svelte';
     import { Form } from '@inertiajs/svelte';
     import { LoaderCircle } from 'lucide-svelte';
-    import { route } from 'ziggy-js';
 
     interface Question {
         id: number;
