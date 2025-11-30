@@ -1,0 +1,414 @@
+---
+alwaysApply: true
+---
+# MeNu Care - Mental Health Tracking Platform for Medical Workers
+
+## Project Overview
+
+**MeNu Care** is a mental health tracking platform designed specifically for medical workers (tenaga kesehatan). The application helps users track their daily stress levels through PSS-10 quizzes, maintain journals, view progress charts, and access personalized mindfulness content.
+
+**Key Features:**
+- Daily PSS-10 stress assessment quiz (24-hour validity)
+- Journaling system (optional)
+- Progress tracking with charts
+- Mindfulness content (articles, videos, audios) filtered by stress level
+- Admin dashboard for content management and user monitoring
+
+## Tech Stack
+
+**Backend:**
+- Laravel 12 (PHP 8.2+)
+- MySQL 8
+- FilamentPHP 4 (Admin Panel)
+- Laravel Session-based authentication (Inertia.js SPA)
+
+**Frontend:**
+- Svelte 5 + TypeScript
+- Inertia.js 2 (SPA architecture with SSR support)
+- TailwindCSS 4
+- shadcn-svelte (component library)
+- Vite (build tool)
+
+**Key Packages:**
+- `inertiajs/inertia-laravel`: ^2.0.10
+- `filament/filament`: ^4.0
+- `tightenco/ziggy`: ^2.6.0 (route helper)
+
+## Architecture Patterns
+
+### Authentication
+- **Session-based authentication** (NOT API tokens/Sanctum)
+- Session lifetime: 120 minutes (configurable via `SESSION_LIFETIME` env)
+- Auto-logout after idle
+- Middleware: `auth`, `verified`, `quiz.completed`
+
+### Routing
+- Web routes: `routes/web.php`
+- Auth routes: `routes/auth.php`
+- Settings routes: `routes/settings.php`
+- Use Inertia.js for SPA navigation (no full page reloads)
+
+### Frontend Structure
+- Pages: `resources/js/pages/*.svelte`
+- Components: `resources/js/components/`
+- Layouts: `resources/js/layouts/`
+- Types: `resources/js/types/`
+- Use Inertia's `<Link>` component for navigation
+
+## Core Business Rules
+
+### 1. Daily Quiz (PSS-10)
+
+**Quiz Details:**
+- 10 questions, 5-point Likert scale (0-4)
+- Answer options: "Tidak Pernah" (0), "Hampir Tidak Pernah" (1), "Kadang-Kadang" (2), "Cukup Sering" (3), "Sangat Sering" (4)
+- Questions 4, 5, 7, 8 are **reverse-scored** (score = 4 - answer)
+- Questions 1, 2, 3, 6, 9, 10 are forward-scored (use answer directly)
+- Score range: 0-40
+- Categories:
+  - 0-13: `rendah` (Low)
+  - 14-26: `sedang` (Medium)
+  - 27-40: `berat` (High)
+
+**24-Hour Validity Rule:**
+- Quiz is valid for **1x24 hours** from completion time
+- Uses user timezone configured via `APP_TIMEZONE` env variable
+- If quiz completed within last 24 hours → allow homepage access
+- If quiz expired/not completed → redirect to `/quiz` (block all routes except `/profile`, `/logout`)
+- Check uses `created_at` timestamp from `daily_quizzes` table
+
+**Post-Quiz Flow:**
+- **ALL categories redirect to Homepage (BERANDA)** after showing recommendations
+- Show recommendations based on category
+- For "berat" category: show warning and consultation links (Halodoc, Alodokter)
+
+**Implementation:**
+- Controller: `App\Http\Controllers\QuizController`
+- Model: `App\Models\DailyQuiz`
+- Middleware: `App\Http\Middleware\EnsureQuizCompleted`
+- Questions defined as constants in `QuizController::QUESTIONS`
+
+### 2. User Roles
+
+**Medical Worker (user):**
+- Must complete daily quiz before accessing features
+- Can write journals (optional)
+- Can view progress charts
+- Can access mindfulness content filtered by stress level
+
+**Admin:**
+- Views aggregated dashboards
+- Manages content (articles, videos, audios)
+- Manages user accounts
+- Views user quiz/journal history
+- **Bypasses quiz completion requirement**
+
+### 3. Journaling
+
+- **Optional** feature (not required after quiz)
+- Accessed from Features menu (Fitur Fitur → Jurnal Harian)
+- Fields: `title` (optional), `content` (required), `mood` (1-5)
+- Users can create multiple entries
+
+### 4. Homepage (BERANDA)
+
+- Displays last assessment score result prominently
+- Shows user's current stress category status
+- Main navigation hub to all features
+- Route: `/dashboard` (protected by `quiz.completed` middleware)
+
+### 5. Progress Tracking (Cek Progres)
+
+- Separate page: `/progress`
+- Shows daily stress statistics per date
+- Displays two types of charts:
+  - **Stress score progression** (line chart: X-axis = dates, Y-axis = score 0-40)
+  - **Category distribution** (bar/pie chart: rendah/sedang/berat over time)
+
+### 6. Profile Page
+
+**Sections:**
+- **Personal Data:** Full Name, Profile Photo (editable), Phone Number
+- **Account Settings:** Change Password, Change Email
+- **Logout:** Log out functionality
+- **History:** Quiz history, Journal history (optional)
+
+**Access:** Always accessible (even if quiz expired) via `/profile` route
+
+### 7. Mindfulness Features
+
+**Main Features:**
+- **Short Meditation (Meditasi Singkat)** - Video content
+- **Deep Breathing Relaxation (Relaksasi Nafas Dalam)** - Video content
+- **Positive Affirmation (Afirmasi Positif)** - Video content
+- **Tips and Mental Health Education** - Articles
+
+**Content Filtering:**
+- Content filtered by `recommended_state` enum: `rendah`, `sedang`, `berat`, `semua`
+- Based on user's current stress category
+- Tags field exists but **NOT used for filtering** (for future use)
+
+**Content Tables:**
+- `articles`: title, content, image_path, tags (JSON), recommended_state
+- `videos`: title, description, video_url, recommended_state
+- `audios`: title, description, audio_path, recommended_state
+
+### 8. Consultation Page
+
+- Static page describing user condition and recommended steps
+- Contains links to Halodoc and Alodokter
+- Accessible from Features menu or recommended for "berat" category
+- Shows warning for severe symptoms
+
+## Database Schema
+
+### `users` table
+```php
+- id (bigint, PK)
+- name (string)
+- email (string, unique)
+- password (hashed)
+- role (string: 'user' | 'admin', default: 'user')
+- phone_number (string, nullable)
+- profile_photo_path (string, nullable)
+- last_quiz_date (date, nullable)
+- last_quiz_timestamp (timestamp, nullable) // For 24-hour validity check
+- email_verified_at (timestamp, nullable)
+- remember_token
+- created_at, updated_at
+```
+
+### `daily_quizzes` table
+```php
+- id (bigint, PK)
+- user_id (bigint, FK -> users.id, cascade delete)
+- date (date)
+- answers (json) // Array of 10 answers [0-4]
+- score (integer, 0-40)
+- category (enum: 'rendah' | 'sedang' | 'berat')
+- created_at (timestamp) // Critical for 24-hour validity check
+- updated_at (timestamp)
+```
+
+### `journals` table
+```php
+- id (bigint, PK)
+- user_id (bigint, FK -> users.id, cascade delete)
+- date (date)
+- title (string, nullable)
+- content (text)
+- mood (integer, 1-5)
+- created_at, updated_at
+```
+
+### Content Tables (`articles`, `videos`, `audios`)
+```php
+// All have:
+- id (bigint, PK)
+- title (string)
+- recommended_state (enum: 'rendah' | 'sedang' | 'berat' | 'semua')
+- created_at, updated_at
+
+// articles:
+- content (text)
+- image_path (string, nullable)
+- tags (json, nullable) // Not used for filtering currently
+
+// videos:
+- description (text, nullable)
+- video_url (string) // YouTube or local path
+
+// audios:
+- description (text, nullable)
+- audio_path (string)
+```
+
+## Code Style & Conventions
+
+### PHP (Laravel)
+- Follow PSR-12 coding standards
+- Use Laravel Pint for code formatting (`composer pint`)
+- Use type hints and return types
+- Use strict types: `declare(strict_types=1);` (if applicable)
+- Use Laravel's naming conventions:
+  - Controllers: `PascalCase` (e.g., `QuizController`)
+  - Models: `PascalCase` (e.g., `DailyQuiz`)
+  - Middleware: `PascalCase` (e.g., `EnsureQuizCompleted`)
+  - Routes: `kebab-case` (e.g., `quiz.store`)
+
+### TypeScript/Svelte
+- Use TypeScript strict mode
+- Use Svelte 5 runes syntax (`$state`, `$derived`, `$props`)
+- Use shadcn-svelte components when available
+- Follow TailwindCSS utility-first approach
+- Use Inertia's `<Link>` component for navigation
+- Use `formsnap` for form handling
+
+### File Storage
+- Local storage: `storage/app/public`
+- Profile photos: stored in `storage/app/public/profile-photos`
+- Media files: stored in `storage/app/public/media`
+- Use Laravel's `Storage` facade for file operations
+
+## Important Implementation Details
+
+### Timezone Handling
+- User timezone configured via `APP_TIMEZONE` environment variable
+- 24-hour validity check uses `now()->subHours(24)` which respects app timezone
+- Example: `'APP_TIMEZONE=Asia/Jakarta'` for WIB
+
+### Middleware Exceptions
+The `EnsureQuizCompleted` middleware allows these routes even if quiz expired:
+- `/quiz` (and all quiz.* routes)
+- `/profile` (and all profile.* routes)
+- `/logout`
+
+### Quiz Scoring Logic
+```php
+// Reverse-scored questions (4, 5, 7, 8): score = 4 - answer
+// Forward-scored questions (1, 2, 3, 6, 9, 10): score = answer
+// Total = sum of all 10 scores (0-40 range)
+```
+
+### Model Relationships
+```php
+// User model
+- hasMany(DailyQuiz::class) -> dailyQuizzes()
+- hasMany(Journal::class) -> journals()
+- latestValidQuiz() -> returns DailyQuiz|null (within 24 hours)
+
+// DailyQuiz model
+- belongsTo(User::class) -> user()
+```
+
+### Inertia.js Patterns
+- Use `Inertia::render()` in controllers
+- Pass data as second parameter: `Inertia::render('Page', ['data' => $data])`
+- Use `<Link>` component for navigation (preserves SPA behavior)
+- Use `router.post()` for form submissions
+- Use `useForm()` from `@inertiajs/svelte` for form handling
+
+## File Structure
+
+```
+app/
+├── Http/
+│   ├── Controllers/     # Laravel controllers
+│   ├── Middleware/      # Custom middleware
+│   └── Requests/        # Form request validation
+├── Models/              # Eloquent models
+├── Notifications/       # Email notifications
+└── Providers/           # Service providers
+
+resources/
+├── js/
+│   ├── pages/           # Inertia pages (Svelte components)
+│   ├── components/      # Reusable Svelte components
+│   ├── layouts/         # Layout components
+│   ├── types/           # TypeScript type definitions
+│   └── app.ts           # Main entry point
+
+database/
+├── migrations/          # Database migrations
+├── factories/           # Model factories
+└── seeders/             # Database seeders
+
+routes/
+├── web.php              # Main web routes
+├── auth.php             # Authentication routes
+└── settings.php         # Settings routes
+
+docs/                    # Project documentation
+├── PRD.md              # Product Requirements Document
+├── IMPLEMENTATION_PLAN.md
+├── DATABASE_SCHEMA.md
+├── QUIZ_PSS10.md       # PSS-10 quiz documentation
+└── FLOWCHART_UPDATES.md
+```
+
+## Common Patterns
+
+### Creating a New Feature
+
+1. **Backend:**
+   - Create migration: `php artisan make:migration create_xxx_table`
+   - Create model: `php artisan make:model Xxx`
+   - Create controller: `php artisan make:controller XxxController`
+   - Create form request: `php artisan make:request XxxRequest`
+   - Add routes in `routes/web.php`
+   - Add middleware if needed
+
+2. **Frontend:**
+   - Create page component: `resources/js/pages/Xxx.svelte`
+   - Create reusable components if needed: `resources/js/components/`
+   - Use Inertia's `<Link>` for navigation
+   - Use shadcn-svelte components for UI
+
+### Quiz Completion Check
+```php
+// In User model
+$user->latestValidQuiz(); // Returns DailyQuiz|null
+
+// In middleware/controller
+$validQuiz = DailyQuiz::where('user_id', $userId)
+    ->where('created_at', '>', now()->subHours(24))
+    ->latest('created_at')
+    ->first();
+```
+
+### Content Filtering
+```php
+// Filter content by user's stress category
+$userCategory = $user->latestValidQuiz()?->category ?? 'rendah';
+$articles = Article::where('recommended_state', $userCategory)
+    ->orWhere('recommended_state', 'semua')
+    ->get();
+```
+
+## Environment Variables
+
+Key environment variables:
+- `APP_TIMEZONE`: User timezone (e.g., 'Asia/Jakarta')
+- `SESSION_LIFETIME`: Session lifetime in minutes (default: 120)
+- `DB_*`: Database configuration
+- `APP_URL`: Application URL
+
+## Testing
+
+- Backend: Pest PHP (PHPUnit-based)
+- Frontend: Playwright (if configured)
+- Run tests: `composer test` or `php artisan test`
+
+## Admin Panel (FilamentPHP)
+
+- Access: `/admin` (or configured panel path)
+- Resources: Create Filament resources for content management
+- Dashboard: Custom widgets for statistics
+- User management: View quiz/journal history per user
+
+## Notes
+
+- **Journaling is optional** - users are not forced to journal after quiz
+- **All quiz results redirect to BERANDA** - not directly to journal/consultation
+- **Content filtering uses `recommended_state` only** - tags field exists but not used
+- **Profile and logout routes are always accessible** - even if quiz expired
+- **Admin users bypass quiz completion requirement**
+- **File storage is local** - not cloud storage (S3, etc.)
+
+## Documentation References
+
+- PRD: `docs/PRD.md` - Complete product requirements
+- Implementation Plan: `docs/IMPLEMENTATION_PLAN.md` - Development phases
+- Database Schema: `docs/DATABASE_SCHEMA.md` - Database structure
+- PSS-10 Quiz: `docs/QUIZ_PSS10.md` - Quiz implementation details
+- Flowchart Updates: `docs/FLOWCHART_UPDATES.md` - Key changes from flowchart
+
+---
+
+**When implementing features:**
+1. Always check `docs/` folder for detailed requirements
+2. Follow Laravel and Svelte best practices
+3. Use existing patterns from `QuizController` as reference
+4. Ensure quiz completion middleware is applied correctly
+5. Test timezone handling for 24-hour validity checks
+6. Use Inertia.js for all navigation (maintain SPA behavior)
