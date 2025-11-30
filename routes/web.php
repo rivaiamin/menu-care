@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\QuizController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -10,6 +11,14 @@ Route::get('/', function () {
 Route::get('dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified', 'quiz.completed'])->name('dashboard');
+
+// Quiz routes
+Route::middleware('auth')->group(function () {
+    Route::get('quiz', [QuizController::class, 'show'])->name('quiz');
+    Route::post('quiz', [QuizController::class, 'store'])->name('quiz.store');
+    Route::get('quiz/result', [QuizController::class, 'result'])->name('quiz.result');
+    Route::get('api/quiz/status', [QuizController::class, 'status'])->name('quiz.status');
+});
 
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';

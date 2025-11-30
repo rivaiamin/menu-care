@@ -63,9 +63,8 @@ class EnsureQuizCompleted
             ->first();
 
         // If no valid quiz found, redirect to quiz page
-        // TODO: Update to use route('quiz') once the quiz route is created
         if (! $validQuiz) {
-            return redirect('/quiz');
+            return redirect()->route('quiz');
         }
 
         return $next($request);
