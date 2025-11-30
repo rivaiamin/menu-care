@@ -163,14 +163,14 @@
 
 ---
 
-## Phase 6: Admin Dashboard (Week 5)
+## Phase 6: Admin Dashboard (Week 5) ✅ COMPLETED
 
-### 6.1 FilamentPHP Dashboard
-- [ ] Create Dashboard Widgets:
+### 6.1 FilamentPHP Dashboard ✅
+- [x] Create Dashboard Widgets:
     - Total Users
     - Average Stress Score
     - Category Distribution (Chart)
-- [ ] Customize User Resource (View Quiz/Journal History)
+- [x] Customize User Resource (View Quiz/Journal History)
 
 ---
 

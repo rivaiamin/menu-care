@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Resources\Audio\Tables;
+namespace App\Filament\Resources\Users\Tables;
 
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
@@ -9,19 +9,32 @@ use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
-class AudioTable
+class UsersTable
 {
     public static function configure(Table $table): Table
     {
         return $table
             ->columns([
-                TextColumn::make('title')
+                TextColumn::make('name')
                     ->searchable(),
-                TextColumn::make('description')
-                    ->limit(50)
-                    ->wrap(),
-                TextColumn::make('recommended_state')
-                    ->badge(),
+                TextColumn::make('email')
+                    ->label('Email address')
+                    ->searchable(),
+                TextColumn::make('email_verified_at')
+                    ->dateTime()
+                    ->sortable(),
+                TextColumn::make('role')
+                    ->searchable(),
+                TextColumn::make('phone_number')
+                    ->searchable(),
+                TextColumn::make('profile_photo_path')
+                    ->searchable(),
+                TextColumn::make('last_quiz_date')
+                    ->date()
+                    ->sortable(),
+                TextColumn::make('last_quiz_timestamp')
+                    ->dateTime()
+                    ->sortable(),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

@@ -9,9 +9,11 @@ use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
+use App\Filament\Widgets\AverageStressScoreWidget;
+use App\Filament\Widgets\CategoryDistributionChartWidget;
+use App\Filament\Widgets\TotalUsersWidget;
 use Filament\Support\Colors\Color;
 use Filament\Widgets\AccountWidget;
-use Filament\Widgets\FilamentInfoWidget;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -39,7 +41,9 @@ class AdminPanelProvider extends PanelProvider
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
             ->widgets([
                 AccountWidget::class,
-                FilamentInfoWidget::class,
+                TotalUsersWidget::class,
+                AverageStressScoreWidget::class,
+                CategoryDistributionChartWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,

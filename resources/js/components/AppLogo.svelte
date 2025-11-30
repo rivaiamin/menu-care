@@ -7,6 +7,6 @@
         <AppLogoIcon class="size-5 fill-current text-white! dark:text-black!" />
     </div>
     <div class="flex items-center">
-        <span class="truncate text-sm font-semibold">Menu Care</span>
+        <span class="truncate text-sm font-semibold">MeNu Care</span>
     </div>
 </div>

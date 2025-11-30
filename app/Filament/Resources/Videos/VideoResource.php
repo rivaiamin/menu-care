@@ -11,6 +11,7 @@ use App\Filament\Resources\Videos\Schemas\VideoInfolist;
 use App\Filament\Resources\Videos\Tables\VideosTable;
 use App\Models\Video;
 use BackedEnum;
+use UnitEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -20,7 +21,8 @@ class VideoResource extends Resource
 {
     protected static ?string $model = Video::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedVideoCamera;
+    protected static string | UnitEnum | null $navigationGroup = 'Mindfulness';
 
     public static function form(Schema $schema): Schema
     {

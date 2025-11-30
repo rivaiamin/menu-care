@@ -11,16 +11,17 @@ use App\Filament\Resources\Audio\Schemas\AudioInfolist;
 use App\Filament\Resources\Audio\Tables\AudioTable;
 use App\Models\Audio;
 use BackedEnum;
+use UnitEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
-
 class AudioResource extends Resource
 {
     protected static ?string $model = Audio::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedMusicalNote;
+    protected static string | UnitEnum | null $navigationGroup = 'Mindfulness';
 
     public static function form(Schema $schema): Schema
     {
