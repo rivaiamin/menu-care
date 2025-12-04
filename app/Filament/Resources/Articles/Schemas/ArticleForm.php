@@ -7,6 +7,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Schemas\Schema;
+use Filament\Forms\Components\MarkdownEditor;
 
 class ArticleForm
 {
@@ -16,7 +17,7 @@ class ArticleForm
             ->components([
                 TextInput::make('title')
                     ->required(),
-                Textarea::make('content')
+                MarkdownEditor::make('content')
                     ->required()
                     ->columnSpanFull(),
                 FileUpload::make('image_path')

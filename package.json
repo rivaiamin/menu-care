@@ -19,6 +19,7 @@
         "@tailwindcss/vite": "^4.1.14",
         "@tanstack/table-core": "^8.21.3",
         "@tsconfig/svelte": "^5.0.5",
+        "@types/marked": "^6.0.0",
         "@types/node": "^24.7.2",
         "axios": "^1.12.2",
         "bits-ui": "^2.11.5",
@@ -63,6 +64,7 @@
         "lightningcss-linux-x64-gnu": "^1.30.2"
     },
     "dependencies": {
-        "chart.js": "^4.5.1"
+        "chart.js": "^4.5.1",
+        "marked": "^17.0.1"
     }
 }

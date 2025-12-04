@@ -14,6 +14,7 @@ class ArticleInfolist
             ->components([
                 TextEntry::make('title'),
                 TextEntry::make('content')
+                    ->markdown()
                     ->columnSpanFull(),
                 ImageEntry::make('image_path')
                     ->placeholder('-'),

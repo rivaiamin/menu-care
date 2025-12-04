@@ -21,6 +21,8 @@ class VideosTable
                     ->searchable(),
                 TextColumn::make('recommended_state')
                     ->badge(),
+                TextColumn::make('category')
+                    ->badge(),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

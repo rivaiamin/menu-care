@@ -2,12 +2,13 @@
     import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
     import { Badge } from '@/components/ui/badge';
     import { buttonVariants } from '@/components/ui/button';
+    import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
     import AppLayout from '@/layouts/AppLayout.svelte';
     import { Link } from '@inertiajs/svelte';
     import { type BreadcrumbItem } from '@/types';
     import { onMount } from 'svelte';
     import axios from 'axios';
-    import { Sparkles, ArrowLeft, Loader2 } from 'lucide-svelte';
+    import { Sparkles, ArrowLeft, Loader2, Video, Headphones } from 'lucide-svelte';
 
     interface Video {
         id: number;
@@ -15,13 +16,25 @@
         description: string | null;
         video_url: string;
         recommended_state: 'rendah' | 'sedang' | 'berat' | 'semua';
+        category: string | null;
+        created_at: string;
+        updated_at: string;
+    }
+
+    interface Audio {
+        id: number;
+        title: string;
+        description: string | null;
+        audio_path: string;
+        recommended_state: 'rendah' | 'sedang' | 'berat' | 'semua';
+        category: string | null;
         created_at: string;
         updated_at: string;
     }
 
     interface ContentResponse {
         category: string;
-        content: Video[];
+        content: Video[] | Audio[];
     }
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -40,20 +53,31 @@
     ];
 
     let videos = $state<Video[]>([]);
+    let audios = $state<Audio[]>([]);
     let loading = $state(true);
     let error = $state<string | null>(null);
     let category = $state<string>('');
+    let activeTab = $state<'videos' | 'audios'>('videos');
 
     onMount(async () => {
         try {
-            const response = await axios.get<ContentResponse>(route('content.api', { type: 'videos' }));
-            videos = response.data.content;
-            category = response.data.category;
+            const [videosResponse, audiosResponse] = await Promise.all([
+                axios.get<ContentResponse>(route('content.api', { type: 'videos' }), {
+                    params: { category: 'afirmasi' },
+                }),
+                axios.get<ContentResponse>(route('content.api', { type: 'audios' }), {
+                    params: { category: 'afirmasi' },
+                }),
+            ]);
+
+            videos = videosResponse.data.content as Video[];
+            audios = audiosResponse.data.content as Audio[];
+            category = videosResponse.data.category;
             loading = false;
         } catch (err) {
-            error = 'Gagal memuat video afirmasi';
+            error = 'Gagal memuat konten afirmasi';
             loading = false;
-            console.error('Error loading videos:', err);
+            console.error('Error loading affirmation content:', err);
         }
     });
 
@@ -85,7 +109,7 @@
             <div>
                 <h1 class="text-3xl font-bold tracking-tight">Afirmasi Positif</h1>
                 <p class="text-muted-foreground mt-2">
-                    Video afirmasi positif untuk meningkatkan motivasi dan semangat
+                    Video dan audio afirmasi positif untuk meningkatkan motivasi dan semangat
                 </p>
             </div>
             <Link href={route('mindfulness')} class={buttonVariants({ variant: 'outline' })}>
@@ -104,49 +128,103 @@
                     <p class="text-destructive">{error}</p>
                 </CardContent>
             </Card>
-        {:else if videos.length === 0}
-            <Card>
-                <CardContent class="pt-6">
-                    <p class="text-muted-foreground">Belum ada video afirmasi yang tersedia untuk kategori Anda.</p>
-                </CardContent>
-            </Card>
         {:else}
-            <div class="grid gap-6 md:grid-cols-2">
-                {#each videos as video}
-                    <Card>
-                        <CardHeader>
-                            <div class="flex items-start justify-between">
-                                <CardTitle class="text-lg">{video.title}</CardTitle>
-                                <Badge variant="outline">{category}</Badge>
-                            </div>
-                            {#if video.description}
-                                <CardDescription>{video.description}</CardDescription>
-                            {/if}
-                        </CardHeader>
-                        <CardContent>
-                            {#if isYouTubeUrl(video.video_url)}
-                                <div class="aspect-video w-full overflow-hidden rounded-lg">
-                                    <iframe
-                                        src={getYouTubeEmbedUrl(video.video_url)}
-                                        class="h-full w-full"
-                                        frameborder="0"
-                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                        allowfullscreen
-                                    ></iframe>
-                                </div>
-                            {:else}
-                                <div class="aspect-video w-full overflow-hidden rounded-lg bg-muted">
-                                    <video controls class="h-full w-full">
-                                        <source src={video.video_url} type="video/mp4" />
-                                        Browser Anda tidak mendukung video.
-                                    </video>
-                                </div>
-                            {/if}
-                        </CardContent>
-                    </Card>
-                {/each}
-            </div>
+            <Tabs bind:value={activeTab}>
+                <TabsList class="grid w-full grid-cols-2">
+                    <TabsTrigger value="videos" class="flex items-center gap-2">
+                        <Video class="h-4 w-4" />
+                        Video ({videos.length})
+                    </TabsTrigger>
+                    <TabsTrigger value="audios" class="flex items-center gap-2">
+                        <Headphones class="h-4 w-4" />
+                        Audio ({audios.length})
+                    </TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="videos" class="mt-6">
+                    {#if videos.length === 0}
+                        <Card>
+                            <CardContent class="pt-6">
+                                <p class="text-muted-foreground">Belum ada video afirmasi yang tersedia untuk kategori Anda.</p>
+                            </CardContent>
+                        </Card>
+                    {:else}
+                        <div class="grid gap-6 md:grid-cols-2">
+                            {#each videos as video}
+                                <Card>
+                                    <CardHeader>
+                                        <div class="flex items-start justify-between">
+                                            <CardTitle class="text-lg">{video.title}</CardTitle>
+                                            <Badge variant="outline">{category}</Badge>
+                                        </div>
+                                        {#if video.description}
+                                            <CardDescription>{video.description}</CardDescription>
+                                        {/if}
+                                    </CardHeader>
+                                    <CardContent>
+                                        {#if isYouTubeUrl(video.video_url)}
+                                            <div class="aspect-video w-full overflow-hidden rounded-lg">
+                                                <iframe
+                                                    src={getYouTubeEmbedUrl(video.video_url)}
+                                                    class="h-full w-full"
+                                                    frameborder="0"
+                                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                                    allowfullscreen
+                                                ></iframe>
+                                            </div>
+                                        {:else}
+                                            <div class="aspect-video w-full overflow-hidden rounded-lg bg-muted">
+                                                <video controls class="h-full w-full">
+                                                    <source src={video.video_url} type="video/mp4" />
+                                                    Browser Anda tidak mendukung video.
+                                                </video>
+                                            </div>
+                                        {/if}
+                                    </CardContent>
+                                </Card>
+                            {/each}
+                        </div>
+                    {/if}
+                </TabsContent>
+
+                <TabsContent value="audios" class="mt-6">
+                    {#if audios.length === 0}
+                        <Card>
+                            <CardContent class="pt-6">
+                                <p class="text-muted-foreground">Belum ada audio afirmasi yang tersedia untuk kategori Anda.</p>
+                            </CardContent>
+                        </Card>
+                    {:else}
+                        <div class="grid gap-6 md:grid-cols-2">
+                            {#each audios as audio}
+                                <Card>
+                                    <CardHeader>
+                                        <div class="flex items-start justify-between">
+                                            <CardTitle class="text-lg">{audio.title}</CardTitle>
+                                            <Badge variant="outline">{category}</Badge>
+                                        </div>
+                                        {#if audio.description}
+                                            <CardDescription>{audio.description}</CardDescription>
+                                        {/if}
+                                    </CardHeader>
+                                    <CardContent>
+                                        <div class="space-y-4">
+                                            <div class="flex items-center justify-center rounded-lg bg-muted p-8">
+                                                <Headphones class="h-12 w-12 text-muted-foreground" />
+                                            </div>
+                                            <audio controls class="w-full">
+                                                <source src={audio.audio_path} type="audio/mpeg" />
+                                                <source src={audio.audio_path} type="audio/mp3" />
+                                                Browser Anda tidak mendukung audio.
+                                            </audio>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            {/each}
+                        </div>
+                    {/if}
+                </TabsContent>
+            </Tabs>
         {/if}
     </div>
 </AppLayout>
-

@@ -18,6 +18,8 @@ class VideoInfolist
                 TextEntry::make('video_url'),
                 TextEntry::make('recommended_state')
                     ->badge(),
+                TextEntry::make('category')
+                    ->badge(),
                 TextEntry::make('created_at')
                     ->dateTime()
                     ->placeholder('-'),

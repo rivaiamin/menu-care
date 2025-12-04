@@ -57,6 +57,7 @@ Route::middleware(['auth', 'quiz.completed'])->group(function () {
     Route::get('articles', function () {
         return Inertia::render('mindfulness/Articles');
     })->name('articles');
+    Route::get('articles/{id}', [ContentController::class, 'showArticle'])->name('articles.show');
     Route::get('consultation', function () {
         return Inertia::render('Consultation');
     })->name('consultation');

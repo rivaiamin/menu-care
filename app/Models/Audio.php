@@ -10,6 +10,13 @@ class Audio extends Model
     use HasFactory;
 
     /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'audios';
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var array<int, string>
@@ -19,6 +26,7 @@ class Audio extends Model
         'description',
         'audio_path',
         'recommended_state',
+        'category',
     ];
 }
 

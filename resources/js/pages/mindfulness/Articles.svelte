@@ -113,34 +113,39 @@
         {:else}
             <div class="grid gap-6 md:grid-cols-2">
                 {#each articles as article}
-                    <Card>
-                        <CardHeader>
-                            <div class="flex items-start justify-between">
-                                <CardTitle class="text-lg">{article.title}</CardTitle>
-                                <Badge variant="outline">{category}</Badge>
-                            </div>
-                            <CardDescription>
-                                Dipublikasikan pada {formatDate(article.created_at)}
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent class="space-y-4">
-                            {#if article.image_path}
-                                <div class="aspect-video w-full overflow-hidden rounded-lg bg-muted">
-                                    <img
-                                        src={getImageUrl(article.image_path)}
-                                        alt={article.title}
-                                        class="h-full w-full object-cover"
-                                    />
+                    <Card class="hover:shadow-lg transition-shadow cursor-pointer">
+                        <Link href={route('articles.show', { id: article.id })}>
+                            <CardHeader>
+                                <div class="flex items-start justify-between">
+                                    <CardTitle class="text-lg">{article.title}</CardTitle>
+                                    <Badge variant="outline">{category}</Badge>
                                 </div>
-                            {:else}
-                                <div class="flex aspect-video w-full items-center justify-center rounded-lg bg-muted">
-                                    <ImageIcon class="h-12 w-12 text-muted-foreground" />
+                                <CardDescription>
+                                    Dipublikasikan pada {formatDate(article.created_at)}
+                                </CardDescription>
+                            </CardHeader>
+                            <CardContent class="space-y-4">
+                                {#if article.image_path}
+                                    <div class="aspect-video w-full overflow-hidden rounded-lg bg-muted">
+                                        <img
+                                            src={getImageUrl(article.image_path)}
+                                            alt={article.title}
+                                            class="h-full w-full object-cover"
+                                        />
+                                    </div>
+                                {:else}
+                                    <div class="flex aspect-video w-full items-center justify-center rounded-lg bg-muted">
+                                        <ImageIcon class="h-12 w-12 text-muted-foreground" />
+                                    </div>
+                                {/if}
+                                <div class="prose prose-sm max-w-none">
+                                    {@html article.content.substring(0, 200) + (article.content.length > 200 ? '...' : '')}
                                 </div>
-                            {/if}
-                            <div class="prose prose-sm max-w-none">
-                                {@html article.content.substring(0, 200) + (article.content.length > 200 ? '...' : '')}
-                            </div>
-                        </CardContent>
+                                <div class="pt-2">
+                                    <span class="text-sm text-primary font-medium">Baca selengkapnya →</span>
+                                </div>
+                            </CardContent>
+                        </Link>
                     </Card>
                 {/each}
             </div>

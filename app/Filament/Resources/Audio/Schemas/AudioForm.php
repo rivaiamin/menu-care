@@ -27,6 +27,9 @@ class AudioForm
                 Select::make('recommended_state')
                     ->options(['rendah' => 'Rendah', 'sedang' => 'Sedang', 'berat' => 'Berat', 'semua' => 'Semua'])
                     ->required(),
+                Select::make('category')
+                    ->options(['meditasi' => 'Meditasi', 'relaksasi' => 'Relaksasi', 'afirmasi' => 'Afirmasi'])
+                    ->required(),
             ]);
     }
 }

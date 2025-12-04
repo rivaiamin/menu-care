@@ -20,6 +20,8 @@ class AudioInfolist
                     ->placeholder('-'),
                 TextEntry::make('recommended_state')
                     ->badge(),
+                TextEntry::make('category')
+                    ->badge(),
                 TextEntry::make('created_at')
                     ->dateTime()
                     ->placeholder('-'),
