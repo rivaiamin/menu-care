@@ -140,7 +140,7 @@
                                 class="container mx-auto max-w-3xl px-4 py-8 w-full"
                                 transition:fly={{
                                     x: direction === 'forward' ? 150 : -150,
-                                    duration: 500,
+                                    duration: 300,
                                     opacity: 0.2,
                                     easing: (t) => t * (2 - t) // ease-out
                                 }}
@@ -148,12 +148,12 @@
                                 <!-- Question Header -->
                                 <div
                                     class="text-center mb-12"
-                                    transition:fade={{ duration: 400, delay: 100 }}
+                                    transition:fade={{ duration: 200, delay: 50 }}
                                 >
                                     <div class="inline-flex items-center justify-center w-14 h-14 rounded-full bg-primary/10 text-primary font-semibold mb-6 text-xl shadow-sm">
                                         {questionNumber}
                                     </div>
-                                    <h2 class="text-2xl md:text-3xl lg:text-4xl font-semibold mb-4 leading-relaxed max-w-2xl mx-auto text-foreground">
+                                    <h2 class="text-2xl md:text-3xl lg:text-4xl font-semibold mb-4 leading-relaxed max-w-2xl mx-auto text-foreground" id={`question-${currentQuestion.id}`}>
                                         {currentQuestion.text}
                                     </h2>
                                 </div>
@@ -165,11 +165,12 @@
                                         onValueChange={(value) => handleAnswerChange(currentQuestion.id, value)}
                                         required
                                         class="space-y-3"
+                                        aria-labelledby={`question-${currentQuestion.id}`}
                                     >
                                     {#each answerOptions as option, optionIndex}
                                         <div
                                             class="group relative"
-                                            transition:fade={{ duration: 400, delay: optionIndex * 100 }}
+                                            transition:fade={{ duration: 200, delay: optionIndex * 50 }}
                                         >
                                             <div
                                                 class="flex items-center space-x-4 p-5 rounded-xl border-2 transition-all duration-300 cursor-pointer hover:border-primary/60 hover:bg-accent/50 hover:shadow-md hover:scale-[1.02] active:scale-[0.98] {answers[currentQuestion.id] === option.value ? 'border-primary bg-primary/10 shadow-md scale-[1.02]' : 'border-border bg-background'}"
@@ -200,7 +201,7 @@
                                     </RadioGroup>
 
                                     {#if errors[`answers.${currentQuestion.id}`]}
-                                        <div transition:fade={{ duration: 300 }}>
+                                        <div transition:fade={{ duration: 200 }}>
                                             <InputError
                                                 class="mt-4"
                                                 message={errors[`answers.${currentQuestion.id}`]}
@@ -212,7 +213,7 @@
                                 <!-- Navigation Buttons -->
                                 <div
                                     class="flex items-center justify-between max-w-xl mx-auto"
-                                    transition:fade={{ duration: 400, delay: 400 }}
+                                    transition:fade={{ duration: 200, delay: 200 }}
                                 >
                                     <Button
                                         type="button"
@@ -253,7 +254,7 @@
                                 </div>
 
                                 {#if !currentQuestionAnswered && !isLastQuestion}
-                                    <p class="text-sm text-muted-foreground text-center mt-6 animate-pulse">
+                                    <p class="text-sm text-foreground/70 text-center mt-6 animate-pulse" aria-live="polite">
                                         Pilih jawaban untuk melanjutkan
                                     </p>
                                 {/if}
