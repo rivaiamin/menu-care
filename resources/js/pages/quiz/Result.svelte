@@ -5,7 +5,7 @@
     import { Badge } from '@/components/ui/badge';
     import AppLayout from '@/layouts/AppLayout.svelte';
     import { router } from '@inertiajs/svelte';
-    import { AlertCircle, CheckCircle2, ExternalLink, Info } from 'lucide-svelte';
+    import { AlertCircle, CheckCircle2, ExternalLink, Info, Phone, Building2 } from 'lucide-svelte';
 
     interface Recommendation {
         title: string;
@@ -135,19 +135,49 @@
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <div class="flex flex-wrap gap-4">
-                        {#each result.recommendations.consultationLinks as link}
-                            <Button
-                                variant="outline"
-                                href={link.url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                class="gap-2"
-                            >
-                                {link.name}
-                                <ExternalLink class="h-4 w-4" />
-                            </Button>
-                        {/each}
+                    <div class="space-y-6">
+                        <!-- Online Consultation Links -->
+                        <div>
+                            <h4 class="text-sm font-semibold mb-3 text-muted-foreground">Konsultasi Online</h4>
+                            <div class="flex flex-wrap gap-4">
+                                {#each result.recommendations.consultationLinks as link}
+                                    <Button
+                                        variant="outline"
+                                        href={link.url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        class="gap-2"
+                                    >
+                                        {link.name}
+                                        <ExternalLink class="h-4 w-4" />
+                                    </Button>
+                                {/each}
+                            </div>
+                        </div>
+
+                        <!-- Health Professional Contact -->
+                        <div class="pt-4 border-t">
+                            <h4 class="text-sm font-semibold mb-3 text-muted-foreground">Kontak Tenaga Kesehatan Profesional</h4>
+                            <div class="bg-muted/50 rounded-lg p-4 space-y-3">
+                                <div class="flex items-start gap-3">
+                                    <Building2 class="h-5 w-5 text-primary mt-0.5 shrink-0" />
+                                    <div class="flex-1">
+                                        <p class="font-medium">RSJ Dharma Magraha</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-3 pl-8">
+                                    <Phone class="h-4 w-4 text-muted-foreground shrink-0" />
+                                    <div class="flex flex-col gap-1 text-sm">
+                                        <a href="tel:085711399769" class="text-primary hover:underline">
+                                            0857 1139 9769
+                                        </a>
+                                        <a href="tel:0215388427" class="text-primary hover:underline">
+                                            (021) 538 8427/28
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </CardContent>
             </Card>

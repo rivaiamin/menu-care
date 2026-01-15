@@ -144,11 +144,17 @@
                                         <TrendingUp class="mr-2 h-4 w-4" />
                                         Lihat Progres
                                     </Link>
-                                    <Link
+                                    <!-- <Link
                                         href={route('quiz')}
                                         class={buttonVariants({ variant: 'outline' }) + ' w-full sm:w-auto justify-center border-2 hover:bg-accent/50 transition-colors'}
                                     >
                                         Assessment Baru
+                                    </Link> -->
+                                    <Link
+                                        href={route('quiz.result')}
+                                        class={buttonVariants({ variant: 'outline' }) + ' w-full sm:w-auto justify-center border-2 hover:bg-accent/50 transition-colors'}
+                                    >
+                                        Lihat Hasil Assessment
                                     </Link>
                                 </div>
                             </div>

@@ -169,8 +169,21 @@ class QuizController extends Controller
     {
         $result = $request->session()->get('quiz_result');
 
+        // If no session data, try to get from latest valid quiz
         if (! $result) {
-            return redirect()->route('quiz');
+            $user = $request->user();
+            $latestQuiz = $user->latestValidQuiz();
+
+            if (! $latestQuiz) {
+                return redirect()->route('quiz');
+            }
+
+            // Build result from latest quiz
+            $result = [
+                'score' => $latestQuiz->score,
+                'category' => $latestQuiz->category,
+                'recommendations' => $this->getRecommendations($latestQuiz->category),
+            ];
         }
 
         return Inertia::render('quiz/Result', [
