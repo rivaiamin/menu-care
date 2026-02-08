@@ -4,7 +4,7 @@
     import { Separator } from '@/components/ui/separator';
     import { cn } from '@/lib/utils';
     import { type NavItem } from '@/types';
-    import { Link, page } from '@inertiajs/svelte';
+    import { Link, page, router } from '@inertiajs/svelte';
     import type { Snippet } from 'svelte';
 
     const sidebarNavItems: NavItem[] = [
@@ -20,6 +20,10 @@
             title: 'Appearance',
             href: '/settings/appearance',
         },
+        {
+            title: 'Logout',
+            href: route('logout'),
+        }
     ];
 
     const currentPath = $page.props.ziggy?.location ? new URL($page.props.ziggy.location).pathname : '';
@@ -38,16 +42,24 @@
         <aside class="w-full max-w-xl lg:w-48">
             <nav class="flex flex-col space-x-0 space-y-1">
                 {#each sidebarNavItems as item (item.href)}
-                    <Link href={item.href}>
-                        <Button
-                            variant="ghost"
-                            class={cn('w-full justify-start', {
-                                'bg-muted': currentPath === item.href,
-                            })}
-                        >
-                            {item.title}
-                        </Button>
-                    </Link>
+                    {#if item.href === route('logout')}
+                        <Link href={item.href} method="post" as="button" onclick={() => router.flushAll()}>
+                            <Button variant="ghost" class="w-full justify-start">
+                                {item.title}
+                            </Button>
+                        </Link>
+                    {:else}
+                        <Link href={item.href}>
+                            <Button
+                                variant="ghost"
+                                class={cn('w-full justify-start', {
+                                    'bg-muted': currentPath === item.href,
+                                })}
+                            >
+                                {item.title}
+                            </Button>
+                        </Link>
+                    {/if}
                 {/each}
             </nav>
         </aside>
